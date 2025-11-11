@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<sub-flow name="mule-sales-batch-p-impl-sub-flow" doc:id="a713f405-4c37-4587-8bc9-5ddbe10cc96c" >
+		<ftp:list doc:name="Listing the input files" doc:id="7e1fa31e-5f2c-4f22-8c1b-ba12739c301a" config-ref="FTP_Config" directoryPath="${file.path}"/>
+		<foreach doc:name="For Each" doc:id="94034d7b-86e1-4801-afec-52320aff4e8d">
+					<ee:transform doc:name="setting file path variables" doc:id="22ea04c1-ea44-4cbf-81e3-2c9e49098b44" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="fileName" ><![CDATA[%dw 2.0
+output application/json
+---
+(attributes.name as String)]]></ee:set-variable>
+					<ee:set-variable variableName="path" ><![CDATA[%dw 2.0
+output application/json
+---
+attributes.path]]></ee:set-variable>
+				</ee:variables>
+			
+</ee:transform>
+			<ftp:read doc:name="Reading the file " doc:id="107007d9-d238-47d0-bea1-b7d5c2e3ba71" config-ref="FTP_Config" path="#[payload]"/>
+			<logger level="INFO" doc:name="file status" doc:id="7aa48e35-0b50-4a33-87d2-513fe5d85c1c" message="#[vars.fileName] file fetched Sucessfully"/>
+			<ee:transform doc:name="converting csv to json" doc:id="112e7e7a-fc3b-4431-8a2a-bda45732f6b7" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="file status" doc:id="193bbbe8-a2e6-4154-b595-cb43edc985d5" message="#[vars.fileName]  is moving to batch processing "/>
+			<flow-ref doc:name="mule-sales-batch-p-impl-flow" doc:id="1e57e919-b256-4d1a-a6d3-66d35526c539" name="mule-sales-batch-p-impl-flow"/>
+				</foreach>
+	</sub-flow>
+	<flow name="mule-sales-batch-p-impl-flow" doc:id="db711e2b-a953-48e2-842b-792ac6038149" >
+		<batch:job jobName="mule-sales-batch-p-impl-batch-job" doc:id="92da8417-f127-4ce1-8074-5bb436f20b8a" maxFailedRecords="-1">
+			<batch:process-records >
+				<batch:step name="batch-step-success" doc:id="ddb76163-539d-418f-b98a-29a6e99f1c43" acceptExpression="#[(payload.CustomerID != null and payload.CustomerID != '') and ((payload.Quantity default 0) as Number &gt;= 0)]">
+					<logger level="INFO" doc:name="file status" doc:id="95cac773-aaba-43ff-8c11-211494ce75c0" message="#[vars.fileName] is inside the #[vars.fileName] "/>
+					<ee:transform doc:name="request payload" doc:id="a964c241-fdb9-4d31-8dbd-2bd42b6c332c">
+							<ee:message>
+								<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var records =
+    if (payload is Array)
+        payload
+    else
+        [payload]
+---
+{
+    query: "INSERT INTO sales_data_new(customerid, productid, productname, quantity, amount, orderdate) VALUES (:CustomerID, :ProductID, :ProductName, :Quantity, :Amount, :OrderDate);",
+    params: records map (record) -> {
+        CustomerID: record.CustomerID,
+        ProductID: record.ProductID,
+        ProductName: record.ProductName,
+        Quantity: (record.Quantity as Number) default 0,
+        Amount: (record.Amount as Number) default 0,
+        OrderDate: record.OrderDate
+    }
+}
+]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+					<batch:aggregator doc:name="batch-aggregator-success" doc:id="d71a34d6-ee89-4c41-b77b-fe84fd5f3d69" streaming="true" preserveMimeTypes="true">
+						<logger level="INFO" doc:name="file status" doc:id="fbe057cd-580d-46fa-9716-85726aeb49fe" message="#[vars.fileName] is inBatch-Step-Success aggregator"/>
+						<ee:transform doc:name="payload" doc:id="15c9dc9b-8064-4055-917b-7414c21ba6ba">
+								<ee:message>
+								<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+								</ee:message>
+							<ee:variables >
+							</ee:variables>
+							</ee:transform>
+						<ee:transform doc:name="settig the payload" doc:id="3c241353-6389-4a16-aefe-c6b325dcd06b">
+								<ee:message>
+									<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var flat = flatten(payload default [])
+---
+{
+  query: flat[0].query,                                       // extract query
+  records: flat flatMap ((item) -> item.params default [])    // extract all params
+}
+]]></ee:set-payload>
+								</ee:message>
+								<ee:variables>
+									<ee:set-variable variableName="invalidRecordsPath"><![CDATA[%dw 2.0
+output application/json
+---
+'/success/' ++ (vars.fileName default 'unknown_file') ++ '_success_records_' ++ (now() as String {format: "yyyy-MM-dd"}) ++ '.csv']]></ee:set-variable>
+									<ee:set-variable variableName="invalidRecords"><![CDATA[%dw 2.0
+output application/json
+---
+payload.params]]></ee:set-variable>
+								</ee:variables>
+							</ee:transform>
+						<try doc:name="Try to handle db system errors" doc:id="a30c0d92-c611-4de9-a327-4150f8503f90">
+							<logger level="INFO" doc:name="file status" doc:id="77817fc3-2ef4-4fa0-a159-20b9509bd00b" message="#[vars.fileName] is moving to database system" />
+							<http:request method="POST" doc:name="Requesting to database system" doc:id="7ac0d316-7d16-475f-bd7d-434cc51dbfeb" config-ref="HTTP_Request_configuration_neon" path="${request.path2}" responseTimeout="1000000">
+									<http:body><![CDATA[#[[payload]]]]></http:body>
+								</http:request>
+							<logger level="INFO" doc:name="file status" doc:id="0a38be31-bf9c-4cc7-a385-7c4111ff86a5" message="#[vars.fileName] after inserting valid the data into the database " />
+							<ee:transform doc:name="payload for sucess records" doc:id="0a91f0cf-306e-41f7-8e52-5827ba473dac" >
+								<ee:message >
+									<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+var existing = 
+    if (vars.invalidRecords is Array) 
+        flatten(vars.invalidRecords)
+    else 
+        []
+
+var newRecords =
+    if (payload is Array)
+        flatten(payload)
+    else
+        [payload]
+
+var combined = (existing ++ newRecords)
+                //  remove corrupted binary / non object elements
+                filter (item) -> (item is Object)
+
+---
+combined
+]]></ee:set-payload>
+								</ee:message>
+							</ee:transform>
+							<logger level="INFO" doc:name="file status" doc:id="f0d38a1d-fd63-49a7-8654-bb907151d0db" message="#[vars.fileName] valid records are writting to the success folder"/>
+							<flow-ref doc:name="mule-sales-batch-ftp-write-p-impl-sub-flow" doc:id="0a35e0c3-3c5e-41e6-8005-ec71399a3466" name="mule-sales-batch-ftp-write-p-impl-sub-flow" />
+							<logger level="INFO" doc:name="file status" doc:id="33471f2f-0b29-411c-8e06-505762a0ad50" message="#[vars.fileName] valid records are written to the success folder successfully" />
+							<error-handler>
+								<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="03088c13-643d-4dce-b8c6-54a2e07dc5c4">
+									<set-variable value="#['/error/' ++ (vars.fileName default 'unknown_file') ++ '_system_errors_' ++ now() as String {format: 'yyyy-MM-dd'} ++ '.csv']" doc:name="Setting invalidRecordsPath variable" doc:id="11b8249a-7926-4666-89e4-60577c188b87" variableName="invalidRecordsPath" />
+									<ee:transform doc:name="setting the payload" doc:id="1cb7022b-3b4d-4a18-ab9b-de38d5a4d51b">
+										<ee:message>
+											<ee:set-payload><![CDATA[%dw 2.0
+output text/csv header=true
+---
+(payload.records default []) map {
+    CustomerID: ($.CustomerID default "") as String,
+    ProductID: ($.ProductID default "") as String,
+    ProductName: ($.ProductName default "") as String,
+    Quantity: ($.Quantity default "") as String,
+    Amount: ($.Amount default "") as String,
+    OrderDate: ($.OrderDate default "") as String
+}
+]]></ee:set-payload>
+										</ee:message>
+									</ee:transform>
+									<flow-ref doc:name="mule-sales-batch-ftp-write-p-impl-sub-flow" doc:id="f50a1164-b444-4e4b-9b27-a245a76bb399" name="mule-sales-batch-ftp-write-p-impl-sub-flow" />
+									<logger level="INFO" doc:name="file status" doc:id="b8686a3e-37fa-4d44-94c4-90b48292587c" message="#[vars.fileName] invalid records-system errors are written to the success folder successfully" />
+								
+</on-error-continue>
+							
+</error-handler>
+						</try>
+					
+</batch:aggregator>
+				
+</batch:step>
+				<batch:step name="Batch-Step-Failure" doc:id="17ba916e-e63f-45dd-8702-bdea0d86aaa8" acceptExpression="#[(payload.query == null) and ((payload.CustomerID == null or payload.CustomerID == '') or (payload.Quantity != null and payload.Quantity &lt; 0))]">
+					<logger level="INFO" doc:name="file status" doc:id="b4e4cdce-6f74-4c49-8936-a908d4caaac4" message="#[vars.fileName]  is inside the Batch-Step-Failure"/>
+					<ee:transform doc:name="payload" doc:id="f65c771d-85b6-4de7-ba03-30e7cae9bdd8" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload
+]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					<batch:aggregator doc:name="Batch-Aggregator-Failure" doc:id="64ac72b3-c942-461a-beef-4b94ba8feb88" streaming="true" preserveMimeTypes="true">
+						<logger level="INFO" doc:name="file status" doc:id="24eb5feb-f81b-47d3-8d78-6a35c971cd1b" message="#[vars.fileName] is inside the Batch-Step-Failure aggregator" />
+						<ee:transform doc:name="setting the required payload" doc:id="69553846-57b2-4768-a0a9-cf7030a4ebc0" >
+							<ee:message >
+								<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload
+]]></ee:set-payload>
+							</ee:message>
+							<ee:variables >
+								<ee:set-variable variableName="invalidRecordsPath" ><![CDATA[%dw 2.0
+output application/json
+---
+'/error/' ++ (vars.fileName default 'unknown_file') ++ '_validation_errors_' ++ now() as String {format: 'yyyy-MM-dd'} ++ '.csv']]></ee:set-variable>
+							</ee:variables>
+						</ee:transform>
+						<flow-ref doc:name="mule-sales-batch-ftp-write-p-impl-sub-flow" doc:id="3d0dbb67-e765-45c3-9b47-468fb8a0b91c" name="mule-sales-batch-ftp-write-p-impl-sub-flow" />
+						<logger level="INFO" doc:name="file status" doc:id="a1fb1753-28cc-464d-be90-c295c5a176a6" message="#[vars.fileName] invalid records-validation errors are written to the success folder successfully"/>
+					
+</batch:aggregator>
+				</batch:step>
+			</batch:process-records>
+			<batch:on-complete >
+				<flow-ref doc:name="mule-sales-batch-p-impl-on-complete-sub-flow" doc:id="1cdb9ee5-27a2-4bcd-8659-be79d9056620" name="mule-sales-batch-p-impl-on-complete-sub-flow" />
+			</batch:on-complete>
+		</batch:job>
+	</flow>
+	<sub-flow name="mule-sales-batch-ftp-write-p-impl-sub-flow" doc:id="8bbcdb1f-355c-4103-9154-3bdc10aa697e" >
+		<os:contains doc:name="Contains" doc:id="5aebfbf6-6f29-4218-b02a-08a88b20fe27" objectStore="orders_lastupdated_store" key="#[vars.invalidRecordsPath]" target="headerExists"/>
+		<choice doc:name="header exists?" doc:id="8ad911d6-2337-41ad-878e-30e7e0da3be6" >
+			<when expression="#[vars.headerExists == true]">
+				<ftp:write doc:name="Writing to error folder without headers" doc:id="40a78cbd-e149-4065-a634-4dbf87b21349" config-ref="FTP_Config" path="#[vars.invalidRecordsPath]" mode="APPEND" >
+					<ftp:content ><![CDATA[#[%dw 2.0
+output text/csv header=false
+---
+payload]]]></ftp:content>
+				</ftp:write>
+				<logger level="INFO" doc:name="file status" doc:id="c44f0f95-5ef9-40f5-acc3-f83e1a3070d6" message="#[vars.fileName] written to error folder "/>
+			</when>
+			<otherwise>
+				<ftp:write doc:name="Writing to error folder with headers" doc:id="b6fa9dbd-8611-4d1a-a697-c6e04d9b9e32" config-ref="FTP_Config" path="#[vars.invalidRecordsPath]" mode="APPEND" >
+					<ftp:content ><![CDATA[#[%dw 2.0
+output text/csv header=true
+---
+payload]]]></ftp:content>
+				</ftp:write>
+				<os:store doc:name="Storing the headers" doc:id="5c933c99-9cc9-40a1-bbec-02580a27e606" key="#[vars.invalidRecordsPath]" objectStore="orders_lastupdated_store">
+					<os:value ><![CDATA[#[now() as String {format: "yyyyMMdd"}]]]></os:value>
+				</os:store>
+				<logger level="INFO" doc:name="file status" doc:id="21d1063b-7669-4e1b-88c8-9a94b7599f92" message="#[vars.fileName] written to error folder"/>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="mule-sales-batch-p-impl-on-complete-sub-flow" doc:id="2a095b23-c479-463c-97ac-e259eab811c8" >
+		<logger level="INFO" doc:name="payload checking " doc:id="3fe741dc-d22d-46b6-bdc5-541766f65f44" message="#['on-complete payload = ' ++ write(payload,'application/json')]" />
+		<logger level="INFO" doc:name="Logger" doc:id="0c5fb332-d30c-4b9b-8d26-7fcbbb009bb7" message="#[payload]"/>
+		<set-variable value='#[%dw 2.0&#10;output application/java&#10;var name = (vars.fileName as String) &#10;var ts = now() as String {format: "yyyyMMdd"}&#10;---&#10;"/archive/" ++ (name splitBy "." )[0] ++ "_" ++ ts ++ "." ++ (name splitBy ".")[-1]]' doc:name="Set Variable" doc:id="64ab56d1-0860-4a9c-9a17-e8ca8be94f52" variableName="move"/>
+		<logger level="INFO" doc:name="file status" doc:id="db64b95f-9721-4d40-aec9-e9725fb844c6" message="#[vars.fileName] moving to the archive folder"/>
+		<ftp:move doc:name="Moving the file to archive" doc:id="5b68fe45-f8fc-4674-8d68-6326e52950ae" config-ref="FTP_Config" sourcePath="#[vars.path]" targetPath="/archive" renameTo='#[vars.move]'/>
+		<logger level="INFO" doc:name="file status" doc:id="c0255f23-64af-4bd1-a5c3-d652f3028401" message="#[vars.fileName] moved to the archive folder successfully"/>
+		<set-variable value="#[payload]" doc:name="Setting report variable" doc:id="b9cef470-d86c-4af6-bda6-54d0d6a4042c" variableName="report" />
+		<parse-template doc:name="Parse Template" doc:id="b63020c1-e466-44fe-aa3f-7856c5340d5b" location="template/salesDataEmail.html" target="emailBody" outputMimeType="text/html" />
+		<ee:transform doc:name="payload" doc:id="7c4bbdf7-4c08-484b-b8be-a7b68011bfe3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  body: (vars.emailBody as String)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="file status" doc:id="10a25ed3-66f1-4258-8df3-63324776b4a0" message="#[vars.fileName] before sending the email "/>
+		<http:request method="POST" doc:name="Requesting to email system" doc:id="c6137aa7-44f7-4257-9017-26a72b633ee8" config-ref="HTTP_Request_configuration_email" path="${request.path1}" responseTimeout="1000000" />
+		<logger level="INFO" doc:name="file status" doc:id="1e9bfc76-c413-4666-9648-8003761ae865" message="#[vars.fileName] after sending email successfully" />
+	</sub-flow>
+
+</mule>
+ 

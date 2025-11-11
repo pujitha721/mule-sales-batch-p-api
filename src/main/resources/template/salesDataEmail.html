@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8"/>
+  <style>
+    body { font-family: Arial; font-size: 14px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #aaa; padding: 6px; }
+    th { background: #eee; text-align: left; }
+  </style>
+</head>
+<body>
+
+<h3>Sales Batch Summary</h3>
+
+<table>
+  <tr><th>Batch Job ID</th><td>#[(vars.report.batchJobInstanceId default "") as String]</td></tr>
+  <tr><th>Total Records</th><td>#[(vars.report.totalRecords default 0) as String]</td></tr>
+  <tr><th>Success Records</th><td>#[(vars.report.successfulRecords default 0) as String]</td></tr>
+  <tr><th>Failure Records</th><td>#[(vars.report.failedRecords default 0) as String]</td></tr>
+</table>
+
+<br/>
+
+<h4>Batch Step Summary</h4>
+<table>
+  <tr>
+    <th>Batch Step</th>
+    <th>Received Records</th>
+    <th>Success Records</th>
+    <th>Failure Records</th>
+  </tr>
+
+  #[ (vars.report.batchStepResults default {}) pluck ((value, key) ->
+      "<tr>" ++
+      "<td>" ++ (key as String) ++ "</td>" ++
+      "<td>" ++ ((value.receivedRecords default 0) as String) ++ "</td>" ++
+      "<td>" ++ ((value.successfulRecords default 0) as String) ++ "</td>" ++
+      "<td>" ++ ((value.failedRecords default 0) as String) ++ "</td>" ++
+      "</tr>"
+  ) joinBy "" ]
+
+</table>
+
+</body>
+</html>

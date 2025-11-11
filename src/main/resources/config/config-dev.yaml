@@ -1,0 +1,77 @@
+# API specification
+#Autodiscovery
+api:
+  #Replace with respective autodiscovery id 
+  autodiscoveryID: "00000000"
+  
+# Listener configuration
+https:
+  host: "0.0.0.0"
+  port: "8081"
+  
+file:
+  path: "/input"
+  cron: "0 0/30 * * * ?"
+  
+request:
+  host: "localhost"
+  portn: "8082"
+  porte: "8083"
+  base: "/api"
+  path1: "/send-notification"
+  path2: "/insert-sales-record"
+  response: "1000000"
+  
+ftp:
+  host: "127.0.0.1"
+  port: "21"
+  username: "new user"
+  password: "pujitha"
+
+
+#API Configurations
+orders-prc-api:   
+  http-listener:
+    path: "/api/*"
+  http-client:
+      client-id:  "Client Id overridden at deploy time"  
+      client-secret: "Client secret overridden at deploy time"   
+
+#AMQ Configurations
+anypoint-mq:
+    server-url: ""
+    slsorders-queue-name: ""
+    slsorders-dl-queue-name: ""
+    fetchSize: "10"
+    frequency: "10000"
+    ackTimeout: "10000"
+    client-id:  "Client Id overridden at deploy time" 
+    client-secret: "Client secret overridden at deploy time"
+
+# Retry configuration
+retry:
+   http: 
+    delayMillisecs: "3000"
+    numRetries: "3"
+   amq:
+    delayMillisecs: "3000"
+    numRetries: "3"
+    
+# Reconnect configuration
+reconnection:
+   amq:
+    frequency: "2000"
+    attempts: "2"
+   http: 
+    delayMillisecs: "3000"
+    numRetries: "3"
+    
+  
+# Object Store configuration for Object Store: orders_lastupdated_store
+order-lastupdated:
+  entryTtl: "24"
+  entryTtlUnit: "HOURS"
+  maxEntries: "10"
+  persistent: "true"
+  expirationInterval: "30"
+  expirationIntervalUnit: "MINUTES"  

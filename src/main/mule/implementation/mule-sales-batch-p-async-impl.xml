@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<flow name="mule-sales-batch-p-async-implFlow" doc:id="6439da99-01ec-42e5-961c-458027ecf2c6" >
+		<scheduler doc:name="Scheduler" doc:id="be339f26-eaf9-4abe-8f63-60617f946bb3" >
+			<scheduling-strategy >
+				<cron expression="${file.cron}" />
+			</scheduling-strategy>
+		</scheduler>
+		<flow-ref doc:name="mule-sales-batch-p-impl-sub-flow" doc:id="aa1a4b90-4885-468f-ab5c-b6597d76ec41" name="mule-sales-batch-p-impl-sub-flow"/>
+	</flow>
+</mule>

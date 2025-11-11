@@ -1,0 +1,29 @@
+%dw 2.0
+
+type auto_d96ff47a_a8ce_4ea4_8269_20d3541bae16_Input_Variables_rootMessage = {|
+  payload: Array<org_mule_runtime_api_message_Message {"typeId": "org.mule.runtime.api.message.Message"}>, 
+  attributes: Null
+|} {"typeId": "org.mule.runtime.api.message.Message"}
+type org_mule_runtime_api_message_Message = {|
+  payload: String, 
+  attributes: org_mule_extension_sftp_api_SftpFileAttributes {"typeId": "org.mule.extension.sftp.api.SftpFileAttributes",
+  "class": "org.mule.extension.sftp.api.SftpFileAttributes",
+  "typeAlias": "SftpFileAttributes"}
+|} {"typeId": "org.mule.runtime.api.message.Message"}
+type org_mule_extension_sftp_api_SftpFileAttributes = {|
+  timestamp: DateTime {"typeId": "java.time.ZonedDateTime"}, 
+  size: Number, 
+  regularFile?: Boolean {"typeId": "boolean"}, 
+  directory?: Boolean {"typeId": "boolean"}, 
+  symbolicLink?: Boolean {"typeId": "boolean"}, 
+  permissions: Number, 
+  path: String, 
+  fileName: String
+|} {"typeId": "org.mule.extension.sftp.api.SftpFileAttributes",
+"class": "org.mule.extension.sftp.api.SftpFileAttributes",
+"typeAlias": "SftpFileAttributes"}
+
+
+
+
+

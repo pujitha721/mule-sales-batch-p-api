@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_8bbcdb1f_355c_4103_9154_3bdc10aa697e_Output_Variables_invalidRecords = Array<Any>
+

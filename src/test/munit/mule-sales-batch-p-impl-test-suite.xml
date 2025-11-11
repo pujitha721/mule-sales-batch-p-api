@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="mule-sales-batch-p-impl-test-suite.xml" />
+	<munit:test name="mule-sales-batch-p-impl-test-suite-mule-sales-batch-p-impl-sub-flowTest" doc:id="80c03ad4-a6a3-44ce-ba02-7107f308ff59" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="87742a50-6d51-4efe-b6c0-26a5ab1e4f33" processor="ftp:read">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Reading the file " attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="107007d9-d238-47d0-bea1-b7d5c2e3ba71" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[MunitTools::getResourceAsStream("read.csv")]' mediaType="application/csv" encoding="ISO-8859-6" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="88d2f571-01af-4b7b-87e7-8e7ef1a0513f" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="POST" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Requesting to email system" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to mule-sales-batch-p-impl-sub-flow" doc:id="f2aa8369-37ba-4369-8815-f8ba9fc6a3aa" name="mule-sales-batch-p-impl-sub-flow"/>
+			<munit-tools:sleep time="1" doc:name="Sleep" doc:id="a2e802c6-4e64-4556-8426-92bde1556972" timeUnit="MINUTES"/>
+		</munit:execution>
+	</munit:test>
+
+
+</mule>

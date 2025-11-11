@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_d96ff47a_a8ce_4ea4_8269_20d3541bae16_Input_Payload = Array<Any>
+

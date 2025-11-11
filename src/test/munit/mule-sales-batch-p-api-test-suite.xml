@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="mule-sales-batch-p-api-test-suite.xml" />
+	<munit:test name="APIKIT:BAD_REQUEST" doc:id="d86ea2ad-d251-484b-8e07-163fa7b51106" description="Test" expectedErrorType="APIKIT:BAD_REQUEST">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="e905da9b-3d33-407b-97d6-8de6f3a962c2" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mule-sales-batch-p-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:BAD_REQUEST" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to mule-sales-batch-p-api-main" doc:id="a5b34ecd-061f-45aa-b4ed-141345d9d493" name="mule-sales-batch-p-api-main"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="APIKIT:NOT_FOUND" doc:id="072b3599-0337-4cc2-a9db-aec97b5157a0" description="Test" expectedErrorType="APIKIT:NOT_FOUND" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="4e872326-a7a2-4813-a191-9ec3e516524f" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mule-sales-batch-p-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_FOUND" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to mule-sales-batch-p-api-main" doc:id="b90561b8-b18d-4e83-bd3d-59ffe849cf09" name="mule-sales-batch-p-api-main" />
+		</munit:execution>
+	</munit:test>
+	<munit:test name="APIKIT:METHOD_NOT_ALLOWED" doc:id="2903ea65-ede9-4282-bbcb-9009182382b9" description="Test" expectedErrorType="APIKIT:METHOD_NOT_ALLOWED" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="b5bbd454-bc91-477a-81e6-f15b7b40ec79" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mule-sales-batch-p-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:METHOD_NOT_ALLOWED" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to mule-sales-batch-p-api-main" doc:id="6c4a24d3-df3a-4b99-852e-f3bbec8a4b3f" name="mule-sales-batch-p-api-main" />
+		</munit:execution>
+	</munit:test>
+	<munit:test name="APIKIT:NOT_ACCEPTABLE" doc:id="0e7f5bab-ac7c-4a86-a54a-c3080177fafc" description="Test" expectedErrorType="APIKIT:NOT_ACCEPTABLE" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="44c30b1d-07f8-4aaf-8a35-e1a10886aa22" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mule-sales-batch-p-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_ACCEPTABLE" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to mule-sales-batch-p-api-main" doc:id="6fb443de-2600-4d83-84c1-c7bd53bcc36a" name="mule-sales-batch-p-api-main" />
+		</munit:execution>
+	</munit:test>
+	<munit:test name="APIKIT:UNSUPPORTED_MEDIA_TYPE" doc:id="7db222fd-9dc1-4d6b-a72a-50face0eb033" description="Test" expectedErrorType="APIKIT:UNSUPPORTED_MEDIA_TYPE" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="dfc73f2e-3de2-4082-8cc0-774944995e84" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mule-sales-batch-p-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:UNSUPPORTED_MEDIA_TYPE" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to mule-sales-batch-p-api-main" doc:id="488ded14-854d-4c52-b0c4-33a9466cb3d6" name="mule-sales-batch-p-api-main" />
+		</munit:execution>
+	</munit:test>
+	<munit:test name="APIKIT:NOT_IMPLEMENTED" doc:id="e954862b-9355-47e3-8ea9-e45a684ff367" description="Test" expectedErrorType="APIKIT:NOT_IMPLEMENTED" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="2c6cc1be-e26e-4c0f-b0f5-a0053bd3ca9c" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mule-sales-batch-p-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_IMPLEMENTED" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to mule-sales-batch-p-api-main" doc:id="9ea96950-b261-4f7a-a4f3-120444c779ae" name="mule-sales-batch-p-api-main" />
+		</munit:execution>
+	</munit:test>
+	<munit:test name="HTTP:BAD_GATEWAY" doc:id="1621133f-8245-40d6-b925-9d78472e5224" description="Test" expectedErrorType="HTTP:BAD_GATEWAY" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="0b6084cc-ac96-4b0f-9a08-b9ee35073e36" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mule-sales-batch-p-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="HTTP:BAD_GATEWAY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to mule-sales-batch-p-api-main" doc:id="3eafb2fd-09fd-4edd-b7ae-254a27f7ec49" name="mule-sales-batch-p-api-main" />
+		</munit:execution>
+	</munit:test>
+	<munit:test name="HTTP:BAD_REQUEST" doc:id="4739c925-ec1c-4d2a-b91c-b9cdfbb5909a" description="Test" expectedErrorType="HTTP:BAD_REQUEST" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="4fdd625d-55b8-4087-9e0d-f22585c552af" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mule-sales-batch-p-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="HTTP:BAD_REQUEST" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to mule-sales-batch-p-api-main" doc:id="05113177-6855-4f6e-8b52-66890bc520bf" name="mule-sales-batch-p-api-main" />
+		</munit:execution>
+	</munit:test>
+	<munit:test name="HTTP:NOT_FOUND" doc:id="8eb324a2-ee32-42d7-a8c7-3af138b875a4" description="Test" expectedErrorType="HTTP:NOT_FOUND" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="0c88522a-9648-44a7-b79b-08f945c10872" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mule-sales-batch-p-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="HTTP:NOT_FOUND" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to mule-sales-batch-p-api-main" doc:id="c39785dd-dca2-4fce-9e99-8b034197a5e5" name="mule-sales-batch-p-api-main" />
+		</munit:execution>
+	</munit:test>
+	<munit:test name="HTTP:METHOD_NOT_ALLOWED" doc:id="f9e588d4-26c6-47e3-b377-ea677cfb71ee" description="Test" expectedErrorType="HTTP:METHOD_NOT_ALLOWED" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="bec1773c-4458-42ae-8cdc-7b7a943c69c2" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mule-sales-batch-p-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="HTTP:METHOD_NOT_ALLOWED" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to mule-sales-batch-p-api-main" doc:id="2504ca99-af7b-4b08-90e1-c874a7acabaf" name="mule-sales-batch-p-api-main" />
+		</munit:execution>
+	</munit:test>
+	<munit:test name="ANY" doc:id="021889ee-42f7-453b-bd50-5e5658fc9789" description="Test" expectedErrorType="ANY" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="011e510a-2483-481f-ab8f-bf20d66cc369" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mule-sales-batch-p-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="ANY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to mule-sales-batch-p-api-main" doc:id="b98570b9-9e45-4574-b2a8-8a4dd0897f1f" name="mule-sales-batch-p-api-main" />
+		</munit:execution>
+	</munit:test>
+	<!-- [STUDIO:"FTP:CONNECTIVITY"]<munit:test name="FTP:CONNECTIVITY" doc:id="47344044-bbda-454d-881d-6c73a2a4dd3b" description="Test" expectedErrorType="FTP:CONNECTIVITY" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="5e33bfed-5cab-43c6-9876-6669d529114b" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mule-sales-batch-p-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="FTP:CONNECTIVITY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to mule-sales-batch-p-api-main" doc:id="0c6b2e2d-74ca-48a4-9ad6-ea1754039db3" name="mule-sales-batch-p-api-main" />
+		</munit:execution>
+	</munit:test> [STUDIO] -->
+	<munit:test name="mule-sales-batch-p-api-test-suite-get:\process-sales-data:mule-sales-batch-p-api-configTest" doc:id="96bdd1e3-3511-4b52-98a4-8f0b400598a5" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="8004e9b3-0baa-49d9-9598-2e82e2d0d008" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="mule-sales-batch-p-impl-sub-flow" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="2bfade23-13ca-421f-8a34-333307fcf6d8" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get:\process-sales-data:mule-sales-batch-p-api-config" doc:id="3a44908e-3acf-470d-9233-4550a6acb1ad" name="get:\process-sales-data:mule-sales-batch-p-api-config"/>
+		</munit:execution>
+	</munit:test>
+
+
+</mule>

@@ -1,0 +1,58 @@
+# API specification
+#Autodiscovery
+api:
+  #Replace with respective autodiscovery id 
+  autodiscoveryID: ""
+  
+# Listener configuration
+https:
+  host: ""
+  port: ""
+
+#API Configurations
+orders-prc-api:   
+  http-listener:
+    path: ""
+  http-client:
+      client-id:  ""  
+      client-secret: ""   
+
+#AMQ Configurations
+anypoint-mq:
+    server-url: ""
+    slsorders-queue-name: ""
+    slsorders-dl-queue-name: ""
+    fetchSize: ""
+    frequency: ""
+    ackTimeout: ""
+    client-id:  "" 
+    client-secret: ""
+
+# Retry configuration
+retry:
+   http: 
+    delayMillisecs: ""
+    numRetries: ""
+   amq:
+    delayMillisecs: ""
+    numRetries: ""
+    
+# Reconnect configuration
+reconnection:
+   amq:
+    frequency: ""
+    attempts: ""
+   http: 
+    delayMillisecs: ""
+    numRetries: ""
+    
+  
+# Object Store configuration for Object Store: orders_lastupdated_store
+order-lastupdated:
+  entryTtl: ""
+  entryTtlUnit: ""
+  maxEntries: ""
+  persistent: ""
+  expirationInterval: ""
+  expirationIntervalUnit: ""  
+ 
